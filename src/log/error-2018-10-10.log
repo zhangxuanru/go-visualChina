@@ -1,5 +1,0 @@
-[visualChina] 2018/10/10 10:49:46 main.go:24: request start :
-[visualChina] 2018/10/10 11:02:20 main.go:32: request start :
-error: 2018/10/10 11:02:20 main.go:50: hello
-error: 2018/10/10 11:02:43 main.go:50: hello
-error: 2018/10/10 11:06:27 main.go:37: hello
