@@ -1,4 +1,4 @@
-package main
+package config
 
 import (
 	"time"
@@ -7,6 +7,8 @@ import (
 	"log"
 	"io"
 	"flag"
+	"engine"
+	"visualchina/parser"
 )
 
 const (
@@ -16,8 +18,8 @@ const (
 var(
 	Info *log.Logger
 	Error *log.Logger
-	flagType int
-	flagAll  int
+	FlagType int
+	FlagAll  int
 )
 
 func init()  {
@@ -34,19 +36,45 @@ func init()  {
 	Error = log.New(io.MultiWriter(os.Stderr,errorFile),"error: ",log.LstdFlags | log.Lshortfile | log.LUTC)
 
 	//获取命令行参数
-	flag.IntVar(&flagType,"type", 0, "0:编辑图片,1:创意壁纸,2:创意图片,3:设计素材")
-	flag.IntVar(&flagAll,"all",0,"1:抓取所有,0:单个抓取")
+	flag.IntVar(&FlagType,"type", 0, "0:编辑图片,1:创意壁纸,2:创意图片,3:设计素材")
+	flag.IntVar(&FlagAll,"all",0,"1:抓取所有,0:单个抓取")
 	flag.Parse()
 }
 
+type UrlStruct struct {
+	 Url string
+	 Name string
+	 ParseFunc engine.ParserFunc
+}
 
-func initUlrs() map[int]string {
-	urls := map[int]string{
-		0:"https://www.vcg.com/editorial",         //编辑图片
+/*
+	    0:"https://www.vcg.com/editorial",         //编辑图片
 		1:"https://www.vcg.com/sets/wallpaper",   //创意壁纸
 		2:"https://www.vcg.com/creative",        //创意图片
 		3:"https://www.vcg.com/design",         //设计素材
+*/
+func InitUrls() map[int]UrlStruct {
+	urls := map[int] UrlStruct{
+		0:{
+			Url:"https://www.vcg.com/editorial",       //编辑图片
+			Name:"editorial",
+			ParseFunc:parser.ParseEditorial,
+		},
+		1:{
+			Url:"https://www.vcg.com/sets/wallpaper",  //创意壁纸
+			Name:"wallpaper",
+			ParseFunc:parser.ParseEditorial,
+		},
+		2:{
+			Url:"https://www.vcg.com/creative",        //创意图片
+			Name:"creative",
+			ParseFunc:parser.ParseEditorial,
+		},
+		3:{
+			Url:"https://www.vcg.com/design",         //设计素材
+			Name:"design",
+			ParseFunc:parser.ParseEditorial,
+		},
 	}
 	return urls
 }
-
