@@ -2,7 +2,6 @@ package scheduler
 
 import (
 	"engine"
-	"fmt"
 )
 
 type QueuedScheduler struct {
@@ -19,7 +18,6 @@ func (q *QueuedScheduler) Run()  {
 }
 
 func (q *QueuedScheduler) Submit(r engine.Request)  {
-	fmt.Println("r:",r)
        q.requestChan <- r
 }
 

@@ -3,11 +3,19 @@ package engine
 import (
 	"net/http"
 	"logger"
-	"fmt"
 	"io/ioutil"
+	"os"
 )
 
 func Fetch(r Request)(ParseResult,error)  {
+	//test
+	open, _ := os.Open("src/test/editorial.html")
+	all, _ := ioutil.ReadAll(open)
+	return  r.Parser.Parse(all,r.Url,r.Args),nil
+   //test
+
+
+
 	client := &http.Client{}
 	request, e := http.NewRequest("GET", r.Url, nil)
 	if e != nil{
@@ -24,10 +32,11 @@ func Fetch(r Request)(ParseResult,error)  {
 		logger.Error.Println("HTTP GET 获取URL失败:",r.Url)
 		return ParseResult{},nil
 	}
+	if response.StatusCode != http.StatusOK{
+		logger.Error.Println("HTTP GET 获取URL状态码失败:",r.Url,response.StatusCode)
+		return ParseResult{},nil
+	}
 	defer response.Body.Close()
 	bytes, _ := ioutil.ReadAll(response.Body)
-	//goquery.NewDocumentFromReader(resp.Body)
-	fmt.Printf("%s",bytes)
-
-	return ParseResult{},nil
+	return r.Parser.Parse(bytes,r.Url,r.Args),nil
 }

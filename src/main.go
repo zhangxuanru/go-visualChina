@@ -9,6 +9,9 @@ import (
 	"runtime"
 	"github.com/PuerkitoBio/goquery"
 	"os"
+	"engine"
+	"visualchina/parser"
+	"io/ioutil"
 )
 
 var (
@@ -27,9 +30,6 @@ func init()  {
 }
 
 func main(){
-	testgoquery()
-	return
-
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	urls := config.InitUrls()
 	switch flagAll {
@@ -41,7 +41,6 @@ func main(){
 		}
 		spider.InitJobs(urlInfo)
 	}
-	fmt.Println(url)
 }
 
 
@@ -50,18 +49,33 @@ func testgoquery() {
 	if e != nil{
 		panic(e)
 	}
+	bytes, e := ioutil.ReadAll(open)
+	fmt.Println(bytes)
+	return
+
 	document, i := goquery.NewDocumentFromReader(open)
 	if i != nil {
 		panic(i)
 	}
-
+	ret := engine.ParseResult{}
 	document.Find(".classify-list>li").Each(func(i int, selection *goquery.Selection) {
-       a := selection.Find("a")
-		fmt.Println(a.Attr("title"))
-       fmt.Println(a.Attr("href"))
+        a := selection.Find("a")
+        title,fbool := a.Attr("title")
+        if fbool == true {
+			 url,_ := a.Attr("href")
+			 test := engine.Request{
+				 Url:url,
+				 Parser:engine.NewFuncParser( parser.ParseEditorial,title),
+			 }
+			 ret.Requests = append(ret.Requests,test)
 
+			 fmt.Println(test.Parser.GetName())
+
+
+		}
 	})
 
+	fmt.Println(ret)
 }
 
 
