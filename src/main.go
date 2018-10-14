@@ -2,7 +2,6 @@ package main
 
 import (
 	"config"
-	"fmt"
 	"spider"
 	"flag"
 	"logger"
@@ -11,7 +10,8 @@ import (
 	"os"
 	"engine"
 	"visualchina/parser"
-	"io/ioutil"
+	"fmt"
+	"strconv"
 )
 
 var (
@@ -39,7 +39,10 @@ func main(){
 		if urlInfo,ok = urls[flagType];!ok{
               logger.Error.Fatalln("flagType 值非法，没找到相应的URL")
 		}
-		spider.InitJobs(urlInfo)
+		argReq := engine.RequestArgs{
+			Type: strconv.Itoa(flagType),
+		}
+		spider.InitJobs(urlInfo,argReq)
 	}
 }
 
@@ -49,9 +52,6 @@ func testgoquery() {
 	if e != nil{
 		panic(e)
 	}
-	bytes, e := ioutil.ReadAll(open)
-	fmt.Println(bytes)
-	return
 
 	document, i := goquery.NewDocumentFromReader(open)
 	if i != nil {
@@ -69,13 +69,10 @@ func testgoquery() {
 			 }
 			 ret.Requests = append(ret.Requests,test)
 
-			 fmt.Println(test.Parser.GetName())
-
-
 		}
 	})
 
-	fmt.Println(ret)
+	 fmt.Printf("%+v",ret.Requests)
 }
 
 

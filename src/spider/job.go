@@ -13,7 +13,7 @@ func InitAllJobs(urls map[int]config.UrlStruct)  {
 }
 
 //抓取单页面
-func InitJobs(urlinfo config.UrlStruct)  {
+func InitJobs(urlinfo config.UrlStruct,argReq engine.RequestArgs)  {
 	logger.Info.Println("start grab ",urlinfo.Url)
 	e := engine.ConcurrentEngine{
 		WorkerCount: 10,
@@ -23,5 +23,6 @@ func InitJobs(urlinfo config.UrlStruct)  {
       engine.Request{
 		   Url:    urlinfo.Url,
 		   Parser: engine.NewFuncParser(urlinfo.ParseFunc,urlinfo.Name),
+		   Args: argReq,
 	  })
 }

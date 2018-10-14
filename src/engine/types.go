@@ -15,6 +15,7 @@ type Item struct {
 
 type RequestArgs struct {
 	Title string
+	Type  string
 }
 
 type ParseResult struct {

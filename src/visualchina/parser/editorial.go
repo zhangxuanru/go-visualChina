@@ -20,17 +20,16 @@ func ParseEditorial(contents []byte, url string,args engine.RequestArgs) engine.
 		logger.Error.Println("grab url ",url," args:",args," goquery error:",i)
 	}
 	ret := engine.ParseResult{}
-	argReq := engine.RequestArgs{}
 	document.Find(".classify-list>li").Each(func(i int, selection *goquery.Selection) {
 		a := selection.Find("a")
 		title,f := a.Attr("title")
 		if f == true {
-			argReq.Title = title
+			args.Title = title
 			url,_ := a.Attr("href")
 			req := engine.Request{
 				Url:url,
 				Parser:engine.NewFuncParser(ParseEditorialLeftNav,title),
-				Args:argReq,
+				Args:args,
 			}
 			ret.Requests = append(ret.Requests,req)
 		}
@@ -43,9 +42,8 @@ func ParseEditorial(contents []byte, url string,args engine.RequestArgs) engine.
 处理编辑图片 左侧栏目数据
 */
 func ParseEditorialLeftNav(contents []byte,url string,args engine.RequestArgs) engine.ParseResult {
-	go saveLeftNav(url,args)
-
-	return engine.ParseResult{}
+	 go saveLeftNav(url,args)
+	 return engine.ParseResult{}
 }
 
 //保存左侧栏目数据
@@ -53,6 +51,7 @@ func saveLeftNav(url string,args engine.RequestArgs)  {
 	editorial.NavRun(10)
 	editorial.NavSubmit(persist.NavStruct{
 		Title:args.Title,
+		Type:args.Type,
 		Url:url,
 	})
 	editorial.NavSave()
