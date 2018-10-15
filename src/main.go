@@ -9,9 +9,9 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"os"
 	"engine"
-	"visualchina/parser"
 	"fmt"
 	"strconv"
+	"visualchina/parser/editorial"
 )
 
 var (
@@ -65,10 +65,9 @@ func testgoquery() {
 			 url,_ := a.Attr("href")
 			 test := engine.Request{
 				 Url:url,
-				 Parser:engine.NewFuncParser( parser.ParseEditorial,title),
+				 Parser:engine.NewFuncParser( editorial.ParseEditorial,title),
 			 }
 			 ret.Requests = append(ret.Requests,test)
-
 		}
 	})
 

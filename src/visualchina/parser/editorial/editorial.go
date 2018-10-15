@@ -1,4 +1,4 @@
-package parser
+package editorial
 
 import (
 	"engine"
@@ -6,8 +6,8 @@ import (
 	"strings"
 	"logger"
 	"visualchina/persist"
-	"fmt"
 	"visualchina/Model"
+	"fmt"
 )
 
 var editorial = persist.Editorial{}
@@ -19,7 +19,7 @@ func ParseEditorial(contents []byte, url string,args engine.RequestArgs) engine.
 	reader := strings.NewReader(string(contents))
 	document, i := goquery.NewDocumentFromReader(reader)
 	if i != nil {
-		logger.Error.Println("grab url ",url," args:",args," goquery error:",i)
+		 logger.Error.Println("grab url ",url," args:",args," goquery error:",i)
 	}
 	ret := engine.ParseResult{}
 	document.Find(".classify-list>li").Each(func(i int, selection *goquery.Selection) {
@@ -44,43 +44,43 @@ func ParseEditorial(contents []byte, url string,args engine.RequestArgs) engine.
 处理编辑图片 左侧栏目数据
 */
 func ParseEditorialLeftNav(contents []byte,url string,args engine.RequestArgs) engine.ParseResult {
-
-	//test 如果要拿到返回数据，就不能用go routine
-	ret := saveTestLeftNav(url,args)
-	fmt.Println("ret:",ret)
-	return engine.ParseResult{}
-	//test
-
-	bo := make(chan bool)
-	fmt.Println(url)
-    go saveLeftNav(url,args,bo)
-	go editorial.NavDbDataRun()
-	<-bo
-	 return engine.ParseResult{}
+ 	ret := saveLeftNav(url,args)
+ 	result := engine.ParseResult{}
+ 	if ret.Id == 0 {
+		return result
+	}
+	req := engine.Request{
+           Url:ret.Url,
+		   Args:engine.RequestArgs{
+               Id:ret.Id,
+			   Data:ret,
+			},
+			Parser:engine.NewFuncParser(ParseEditorialLeftNavData,ret.Title),
+	}
+	 result.Items = append(result.Items,engine.Item{
+		Data:ret,
+ 	})
+	result.Requests = append(result.Requests,req)
+	return result
 }
+
+
+func ParseEditorialLeftNavData(contents []byte,url string,args engine.RequestArgs) engine.ParseResult {
+	fmt.Println("ParseEditorialLeftNavData:",url,"args",args)
+	return engine.ParseResult{}
+}
+
+
+
 
 //保存左侧栏目数据
-func saveLeftNav(url string,args engine.RequestArgs, b chan bool) {
-	editorial.NavRun(10)
-	editorial.NavDbRun()
-	editorial.NavSubmit(persist.NavStruct{
-		Title:args.Title,
-		Type:args.Type,
-		Url:url,
-	})
-	save := editorial.NavSave()
-	b <- true
-	editorial.NavDbSubmit(save)
-}
-
-
-func saveTestLeftNav(url string,args engine.RequestArgs) Model.NavDb{
+func saveLeftNav(url string,args engine.RequestArgs) Model.NavDb{
 	nav:= persist.NavStruct{
 		Title: args.Title,
 		Type:  args.Type,
 		Url:   url,
 	}
-	save := editorial.NavTestSave(nav)
+	save := editorial.NavSave(nav)
     return save
 }
 

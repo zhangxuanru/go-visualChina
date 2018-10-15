@@ -6,6 +6,7 @@ import (
 	"visualchina/Model"
 	"time"
 	"strconv"
+	"fmt"
 )
 
 type NavStruct struct {
@@ -41,7 +42,12 @@ func (s *Editorial) NavSubmit(r NavStruct)  {
        s.navChan <- r
 }
 
-func (s *Editorial) NavSave(r NavStruct) Model.NavDb {
+func (s *Editorial) NavDbSubmit(r Model.NavDb)  {
+	s.NavDb <- r
+}
+
+func (s *Editorial) NavSave() Model.NavDb {
+	r := <-s.navChan
 	url := hex.EncodeToString([]byte(r.Url))
 	crcStr := crc32.ChecksumIEEE([]byte(url))
 	t,_ := strconv.Atoi( r.Type)
@@ -58,3 +64,32 @@ func (s *Editorial) NavSave(r NavStruct) Model.NavDb {
 }
 
 
+
+//test
+func (s *Editorial) NavTestSave(r NavStruct) Model.NavDb {
+	url := hex.EncodeToString([]byte(r.Url))
+	crcStr := crc32.ChecksumIEEE([]byte(url))
+	t,_ := strconv.Atoi( r.Type)
+	nav := Model.NavDb{
+		Title:r.Title,
+		Url:r.Url,
+		Type: t,
+		Crc32:crcStr,
+		AddDate:time.Now().Unix(),
+	}
+	id, _ := nav.NavSave()
+	nav.Id = id
+	return  nav
+}
+
+
+
+func (s *Editorial) NavDbDataRun()  {
+	for{
+    	r,ok := <- s.NavDb
+	    fmt.Println("rrr:",r)
+    	if ok {
+    		break
+		}
+	}
+}

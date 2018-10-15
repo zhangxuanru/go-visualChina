@@ -5,6 +5,7 @@ import (
 	"sync"
 	"fmt"
 )
+
 var ws sync.WaitGroup
 
 type ConcurrentEngine struct {
@@ -28,7 +29,7 @@ func (c *ConcurrentEngine) Run(seeds ...Request)  {
 	  for _,r := range seeds{
 	  	  c.Scheduler.Submit(r)
 	  }
-	  c.WorkerRun(out)
+	  c.WorkerRun(c.Scheduler.WorkerChan(),out)
 	  ws.Wait()
 }
 
@@ -46,7 +47,7 @@ func (c *ConcurrentEngine) CreateWorker(in chan Request, out chan ParseResult)  
 	}()
 }
 
-func (c *ConcurrentEngine) WorkerRun(out chan ParseResult) {
+func (c *ConcurrentEngine) WorkerRun(in chan Request,out chan ParseResult) {
 	go func() {
 		for{
 			ret := <-out
@@ -54,8 +55,16 @@ func (c *ConcurrentEngine) WorkerRun(out chan ParseResult) {
 				result,err := Fetch(request)
 				if err!=nil{
 					logger.Error.Panic("抓取",request.Url,"失败，失败原因是:",err)
+					break
 				}
-				fmt.Println(result)
+				if result.Requests == nil{
+					logger.Error.Println("抓取",request.Url,"返回空信息")
+                    break
+				}
+				fmt.Println(result.Requests)
+				//for _,r := range result.Requests{
+				//	c.Scheduler.Submit(r)
+				//}
 			}
 			ws.Done()
 		}

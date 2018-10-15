@@ -14,8 +14,10 @@ type Item struct {
 }
 
 type RequestArgs struct {
+	Id    int64
 	Title string
 	Type  string
+	Data interface{}
 }
 
 type ParseResult struct {

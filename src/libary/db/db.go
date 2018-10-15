@@ -14,7 +14,7 @@ var DB  *sql.DB
 
 
 func init(){
-	dataSourceName := fmt.Sprintf("%s:%s@/%s?charset=%s",dbConfig.DB_USER,dbConfig.DB_PASSWORD,dbConfig.DB_DATABASE_NAME,dbConfig.DB_CHARSET)
+	dataSourceName := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s",dbConfig.DB_USER,dbConfig.DB_PASSWORD,dbConfig.DB_HOST,dbConfig.DB_PORT, dbConfig.DB_DATABASE_NAME,dbConfig.DB_CHARSET)
 	DB,err = sql.Open(dbConfig.DB_DRIVER_NAME, dataSourceName)
 	if err != nil{
           logger.Error.Fatal("mysql connect error",err)

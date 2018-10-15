@@ -2,7 +2,7 @@ package config
 
 import (
 	"engine"
-	"visualchina/parser"
+	"visualchina/parser/editorial"
 )
 
 type UrlStruct struct {
@@ -16,22 +16,22 @@ func InitUrls() map[int]UrlStruct {
 		0:{
 			Url:"https://www.vcg.com/editorial",       //编辑图片
 			Name:"editorial",
-			ParseFunc:parser.ParseEditorial,
+			ParseFunc:editorial.ParseEditorial,
 		},
 		1:{
 			Url:"https://www.vcg.com/sets/wallpaper",  //创意壁纸
 			Name:"wallpaper",
-			ParseFunc:parser.ParseEditorial,
+			ParseFunc:editorial.ParseEditorial,
 		},
 		2:{
 			Url:"https://www.vcg.com/creative",        //创意图片
 			Name:"creative",
-			ParseFunc:parser.ParseEditorial,
+			ParseFunc:editorial.ParseEditorial,
 		},
 		3:{
 			Url:"https://www.vcg.com/design",         //设计素材
 			Name:"design",
-			ParseFunc:parser.ParseEditorial,
+			ParseFunc:editorial.ParseEditorial,
 		},
 	}
 	return urls
