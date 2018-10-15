@@ -18,6 +18,8 @@ func (q *QueuedScheduler) Run()  {
 }
 
 func (q *QueuedScheduler) Submit(r engine.Request)  {
-       q.requestChan <- r
+	go func() {
+		q.requestChan <- r
+	}()
 }
 

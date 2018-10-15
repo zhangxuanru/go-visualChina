@@ -11,7 +11,6 @@ import (
 	"engine"
 	"fmt"
 	"strconv"
-	"visualchina/parser/editorial"
 )
 
 var (
@@ -57,21 +56,23 @@ func testgoquery() {
 	if i != nil {
 		panic(i)
 	}
-	ret := engine.ParseResult{}
+	//ret := engine.ParseResult{}
 	document.Find(".classify-list>li").Each(func(i int, selection *goquery.Selection) {
         a := selection.Find("a")
-        title,fbool := a.Attr("title")
-        if fbool == true {
-			 url,_ := a.Attr("href")
-			 test := engine.Request{
-				 Url:url,
-				 Parser:engine.NewFuncParser( editorial.ParseEditorial,title),
-			 }
-			 ret.Requests = append(ret.Requests,test)
-		}
+        title,_ := a.Attr("title")
+		url,_ := a.Attr("href")
+		fmt.Println(title,url)
+		//if fbool == true {
+		//	 url,_ := a.Attr("href")
+		//	 test := engine.Request{
+		//		 Url:url,
+		//		 Parser:engine.NewFuncParser( editorial.ParseEditorial,title),
+		//	 }
+		//	 ret.Requests = append(ret.Requests,test)
+		//}
 	})
 
-	 fmt.Printf("%+v",ret.Requests)
+	// fmt.Printf("%+v",ret.Requests)
 }
 
 
