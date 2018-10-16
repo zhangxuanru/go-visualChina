@@ -22,13 +22,44 @@ func init(){
 }
 
 func Insert(sql string)(id int64, err error) {
+	logger.Info.Println(sql)
 	result, e := DB.Exec(sql)
 	if e != nil{
-		logger.Info.Println("sql:",sql,"err:",e)
-		logger.Error.Println("insert data error:",e)
+		logger.Error.Println(sql,"insert data error:",e)
+		logger.Info.Println("isertid:0","error:",err)
         return 0,e
 	}
 	id, err = result.LastInsertId()
+	logger.Info.Println("isertid:",id,"error:",err)
 	return
 }
+
+//返回单行
+func GetRow(sql string) (r map[string]string, err error)  {
+	logger.Info.Println(sql)
+	rows, e := DB.Query(sql)
+	record := make(map[string]string)
+	if e != nil{
+		logger.Info.Println("querydata:",e)
+		return record, e
+	}
+	col, _ := rows.Columns()
+	scanArgs := make([]interface{},len(col))
+	valArgs  := make([]interface{},len(col))
+	for k:= range valArgs{
+		scanArgs[k] = &valArgs[k]
+	}
+	for rows.Next(){
+		rows.Scan(scanArgs...)
+		for i,cc := range valArgs{
+			if cc != nil{
+				record[col[i]] = string(cc.([]byte))
+			}
+		}
+	}
+	logger.Info.Println(record)
+    return record,nil
+}
+
+
 

@@ -9,6 +9,12 @@ import (
 
 func Fetch(r Request)(ParseResult,error)  {
 	//test
+	if r.Args.Id > 0{
+		file, _ := os.Open("src/test/editorial_update.html")
+		all, _ := ioutil.ReadAll(file)
+		return  r.Parser.Parse(all,r.Url,r.Args),nil
+	}
+
 	open, _ := os.Open("src/test/editorial.html")
 	all, _ := ioutil.ReadAll(open)
 	return  r.Parser.Parse(all,r.Url,r.Args),nil

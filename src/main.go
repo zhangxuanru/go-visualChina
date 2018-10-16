@@ -29,6 +29,9 @@ func init()  {
 }
 
 func main(){
+	//testeditorupdate()
+	//return
+
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	urls := config.InitUrls()
 	switch flagAll {
@@ -46,6 +49,7 @@ func main(){
 }
 
 
+//编辑图片首页匹配
 func testgoquery() {
 	open, e := os.Open("src/test/editorial.html")
 	if e != nil{
@@ -75,7 +79,23 @@ func testgoquery() {
 	// fmt.Printf("%+v",ret.Requests)
 }
 
-
+//编辑图片--栏目页
+func testeditorupdate()  {
+	file, e := os.Open("src/test/editorial_update.html")
+	if e != nil{
+		panic(e)
+	}
+	document, i := goquery.NewDocumentFromReader(file)
+	if i != nil {
+		panic(i)
+	}
+	document.Find(".indexnav-tabs>li").Each(func(i int, selection *goquery.Selection) {
+		a := selection.Find("a")
+		title,_ := a.Attr("title")
+		url,_ := a.Attr("href")
+		fmt.Println(title,"https://www.vcg.com"+url)
+	})
+}
 
 
 

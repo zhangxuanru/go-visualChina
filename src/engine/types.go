@@ -17,6 +17,7 @@ type RequestArgs struct {
 	Id    int64
 	Title string
 	Type  string
+	Pid   int64
 	Data interface{}
 }
 
