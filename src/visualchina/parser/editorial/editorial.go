@@ -25,6 +25,8 @@ func ParseEditorial(contents []byte, url string,args engine.RequestArgs) engine.
 		 logger.Error.Println("grab url ",url," args:",args," goquery error:",i)
 	}
 	ret := engine.ParseResult{}
+	var  parser  engine.ParserFunc
+
 	//首页左边导航处理 start
 	document.Find(".classify-list>li").Each(func(i int, selection *goquery.Selection) {
 		a := selection.Find("a")
@@ -33,9 +35,18 @@ func ParseEditorial(contents []byte, url string,args engine.RequestArgs) engine.
 			args.Title = title
 			url,_ := a.Attr("href")
 			result := saveLeftNav(url,args)
+			parser = ParseEditorialNavLevelPage
+			//原创
+			if strings.Contains(url,"original"){
+				parser = ParseEditorialNavOriginal
+			}
+			//专题
+			if strings.Contains(url,"topics"){
+				parser = ParseEditorialNavTopic
+			}
 			req := engine.Request{
 				Url:url,
-				Parser:engine.NewFuncParser(ParseEditorialNavLevelPage,title),
+				Parser:engine.NewFuncParser(parser,title),
 				Args: engine.RequestArgs{
 				       Id:result.Id,
 				       Type:args.Type,
@@ -51,6 +62,17 @@ func ParseEditorial(contents []byte, url string,args engine.RequestArgs) engine.
 	//首页左边导航处理 end
 	return ret
 }
+
+//原创二级页
+func ParseEditorialNavOriginal(contents []byte,url string,args engine.RequestArgs) engine.ParseResult {
+	return engine.ParseResult{}
+}
+
+//专题二级页
+func ParseEditorialNavTopic(contents []byte,url string,args engine.RequestArgs) engine.ParseResult {
+     return engine.ParseResult{}
+}
+
 
 //抓取栏目 二级页
 func ParseEditorialNavLevelPage(contents []byte,url string,args engine.RequestArgs) engine.ParseResult {
@@ -80,12 +102,12 @@ func ParseEditorialNavLevelPage(contents []byte,url string,args engine.RequestAr
 				},
 			}
 			ret.Requests = append(ret.Requests,req)
-			fmt.Println()
-			fmt.Printf("%s#%s#%+v",title,url,req.Args)
+			fmt.Printf("%s#%s#%+v\r\n",title,url,req.Args)
 		}
 	})
 	//保存子导航栏目并设置子导航栏目函数end
-	return engine.ParseResult{}
+
+	return ret
 }
 
 
