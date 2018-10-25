@@ -62,4 +62,18 @@ func GetRow(sql string) (r map[string]string, err error)  {
 }
 
 
+func UpdateSql(sql string) (count int64, err error) {
+	logger.Info.Println(sql)
+	result, e := DB.Exec(sql)
+	if e != nil{
+		logger.Error.Println(sql,"update data error:",e)
+		logger.Info.Println("update count:0","error:",err)
+		return 0,e
+	}
+	count, err = result.RowsAffected()
+	logger.Info.Println("num:",count,"error:",err)
+	return
+}
+
+
 

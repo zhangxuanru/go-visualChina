@@ -5,12 +5,28 @@ import (
 	"logger"
 	"io/ioutil"
 	"os"
+	"strings"
 )
 
-func Fetch(r Request)(ParseResult,error)  {
+func FetchUrl(r Request) (ParseResult,error){
+    if r.Method == "" || strings.ToUpper(r.Method) == "GET"{
+          return FetchGet(r)
+	  }
+	 return FetchPost(r)
+}
+
+
+
+func FetchGet(r Request)(ParseResult,error)  {
 	//test
+	if r.Args.Id == 12{
+		file, _ := os.Open("src/test/gundong.html")
+		all, _ := ioutil.ReadAll(file)
+		return  r.Parser.Parse(all,r.Url,r.Args),nil
+	}
+
 	if r.Args.Id > 0{
-		file, _ := os.Open("src/test/editorial_update.html")
+		file, _ := os.Open("src/test/nav_view.html")
 		all, _ := ioutil.ReadAll(file)
 		return  r.Parser.Parse(all,r.Url,r.Args),nil
 	}
@@ -46,3 +62,32 @@ func Fetch(r Request)(ParseResult,error)  {
 	bytes, _ := ioutil.ReadAll(response.Body)
 	return r.Parser.Parse(bytes,r.Url,r.Args),nil
 }
+
+
+
+func FetchPost(r Request)(ParseResult,error)  {
+	client := &http.Client{}
+	request, e := http.NewRequest("POST", r.Url, strings.NewReader(r.Content))
+	if e != nil{
+		logger.Error.Println("HTTP POST 获取URL失败:",r.Url)
+		return ParseResult{},nil
+	}
+	request.Header.Add("User-Agent","Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36")
+	request.Header.Add("Referer","https://www.vcg.com/editorial-channel-entertainment")
+	request.Header.Add("Origin","https://www.vcg.com")
+	request.Header.Add("Host","www.vcg.com")
+	request.Header.Add("Content-Type","application/x-www-form-urlencoded")
+	response, i := client.Do(request)
+	if i != nil{
+		logger.Error.Println("HTTP POST 获取URL失败:",r.Url)
+		return ParseResult{},nil
+	}
+	if response.StatusCode != http.StatusOK{
+		logger.Error.Println("HTTP GET 获取URL状态码失败:",r.Url,response.StatusCode)
+		return ParseResult{},nil
+	}
+	defer response.Body.Close()
+	body,_ := ioutil.ReadAll(response.Body)
+	return r.Parser.Parse(body,r.Url,r.Args),nil
+}
+

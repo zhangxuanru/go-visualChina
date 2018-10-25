@@ -2,6 +2,8 @@ package engine
 
 type Request struct {
    Url string
+   Method string
+   Content string
    Args RequestArgs
    Parser Parser
 }
@@ -17,6 +19,7 @@ type RequestArgs struct {
 	Id    int64
 	Title string
 	Type  string
+	Update string
 	Pid   int64
 	Data interface{}
 }

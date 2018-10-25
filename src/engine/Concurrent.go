@@ -46,7 +46,7 @@ func (c *ConcurrentEngine) CreateWorker(in chan Request, out chan ParseResult,re
 	go func() {
 		for{
            request := <-in
-		   result,err := Fetch(request)
+		   result,err := FetchUrl(request)
 		   if err!=nil{
 			    logger.Error.Println("抓取",request.Url,"失败，失败原因是:",err)
 			    continue

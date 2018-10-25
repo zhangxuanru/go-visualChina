@@ -11,6 +11,8 @@ type UrlStruct struct {
 	 ParseFunc engine.ParserFunc
 }
 
+
+
 func InitUrls() map[int]UrlStruct {
 	urls := map[int] UrlStruct{
 		0:{
