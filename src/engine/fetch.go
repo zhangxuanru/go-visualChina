@@ -19,7 +19,7 @@ func FetchUrl(r Request) (ParseResult,error){
 
 func FetchGet(r Request)(ParseResult,error)  {
 	//test
-	if r.Args.Id == 12{
+	if r.Args.Id == 8{
 		file, _ := os.Open("src/test/gundong.html")
 		all, _ := ioutil.ReadAll(file)
 		return  r.Parser.Parse(all,r.Url,r.Args),nil

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"libary/db"
 	"logger"
+	"strings"
 )
 
 type NavDb struct {
@@ -36,6 +37,13 @@ func (nav *NavDb) GetNavDataByCrc32(crc32 uint32) (map[string]string) {
 	r, _ := db.GetRow(sql)
 	return r
 }
+
+func GetNavDataById(id int64,field []string) (map[string]string) {
+	sql:= fmt.Sprintf("SELECT %s FROM %s WHERE id=%d",strings.Join(field,","), table,id)
+	r, _ := db.GetRow(sql)
+	return r
+}
+
 
 func (nav *NavDb) UpdateNavExecTimeById(id int64,execDate int64) (count int64,err error) {
        sql := fmt.Sprintf("UPDATE %s SET exec_date=%d WHERE id=%d",table,execDate,id)

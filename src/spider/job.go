@@ -16,7 +16,7 @@ func InitAllJobs(urls map[int]config.UrlStruct)  {
 func InitJobs(urlinfo config.UrlStruct,argReq engine.RequestArgs)  {
 	logger.Info.Println("start grab ",urlinfo.Url)
 	e := engine.ConcurrentEngine{
-		WorkerCount: 60,
+		WorkerCount: 100,
 		Scheduler : &scheduler.QueuedScheduler{},
 	}
 	e.Run(

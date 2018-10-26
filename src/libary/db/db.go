@@ -62,6 +62,40 @@ func GetRow(sql string) (r map[string]string, err error)  {
 }
 
 
+func GetList(sql string) (result map[int]map[string]string,err error) {
+	logger.Info.Println(sql)
+	rows, e := DB.Query(sql)
+	result = make(map[int]map[string]string)
+	if e != nil{
+		logger.Info.Println("querydata:",e)
+		 return result, e
+	}
+ 	columns, _ := rows.Columns()
+	scanArgs := make([]interface{}, len(columns))
+	values := make([]interface{}, len(columns))
+	for i := range values {
+		scanArgs[i] = &values[i]
+	}
+	k:=0
+	for rows.Next() {
+		err = rows.Scan(scanArgs...)
+		record := make(map[string]string)
+		for i, col := range values {
+			if col != nil {
+				record[columns[i]] = string(col.([]byte))
+			}
+		}
+		result[k] = record
+		k++
+	}
+    return result,nil
+}
+
+
+
+
+
+
 func UpdateSql(sql string) (count int64, err error) {
 	logger.Info.Println(sql)
 	result, e := DB.Exec(sql)

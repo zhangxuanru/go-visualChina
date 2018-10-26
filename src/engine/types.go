@@ -21,6 +21,8 @@ type RequestArgs struct {
 	Type  string
 	Update string
 	Pid   int64
+	NavId  int64
+	CategoryId int64
 	Data interface{}
 }
 

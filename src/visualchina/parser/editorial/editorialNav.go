@@ -92,7 +92,7 @@ func ParseEditorialUpdateOriginal(contents []byte,url string,args engine.Request
 //抓取栏目 二级页
 func ParseEditorialNavLevelPage(contents []byte,url string,args engine.RequestArgs) engine.ParseResult {
 	if args.Update == "1"{ //如果只抓最新的数据则不需要做以下的操作
-		return ParseEditorialTagJsonData()
+		return getGroupDataByNavId(args.Id)
 	}
 	reader := strings.NewReader(string(contents))
 	document, e := goquery.NewDocumentFromReader(reader)
@@ -116,7 +116,7 @@ func ParseEditorialNavLevelPage(contents []byte,url string,args engine.RequestAr
 	for _,recommend := range levelRecommend{
            editorial.SaveRecommend(recommend)
 	}
-	return  ParseEditorialTagJsonData()
+	return  getGroupDataByNavId(args.Id)
 }
 
 
