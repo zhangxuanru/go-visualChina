@@ -5,7 +5,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"strings"
 	"logger"
-	"visualchina/persist"
+	 "visualchina/persist/editorialPersist"
 	"visualchina/Model"
 	"strconv"
 	"time"
@@ -14,7 +14,7 @@ import (
 	"fmt"
 )
 
-var editorial = persist.Editorial{}
+var editorial = editorialPersist.Editorial{}
 
 /*
 抓取 编辑图片首页内容
@@ -108,7 +108,8 @@ func ParseEditorialNavLevelPage(contents []byte,url string,args engine.RequestAr
 	//保存栏目页面底部推广数据
 	generalizeList := query.ParseEditorialLevelGeneralize(document)
 	for _,genera := range generalizeList{
-		genera.ImageId = upload.UploadToQiniu(genera.Src)
+		imageId := upload.UploadToQiniu(genera.Src)
+		genera.ImageId = strconv.FormatInt(imageId,10)
 		editorial.SaveGenera(genera)
 	}
 	//保存栏目页上面的推荐数据

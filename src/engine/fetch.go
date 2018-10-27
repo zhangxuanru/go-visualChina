@@ -66,6 +66,18 @@ func FetchGet(r Request)(ParseResult,error)  {
 
 
 func FetchPost(r Request)(ParseResult,error)  {
+	//test
+	   if r.Args.CategoryId > 0{
+		   file, _ := os.Open("src/test/taglist.json")
+		   defer file.Close()
+		   bytes, _ := ioutil.ReadAll(file)
+		   return  r.Parser.Parse(bytes,r.Url,r.Args),nil
+	   }
+	   return  ParseResult{},nil
+	//test
+
+
+
 	client := &http.Client{}
 	request, e := http.NewRequest("POST", r.Url, strings.NewReader(r.Content))
 	if e != nil{

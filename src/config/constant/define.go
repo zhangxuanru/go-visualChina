@@ -4,5 +4,5 @@ const BaseUrl  = "https://www.vcg.com"
 
 const GroupDataUrl  = "https://www.vcg.com/ajax/channel/tagitemlist"
 
-const MAXGroupData  = 50000
+const MAXGroupData  = 10000
 

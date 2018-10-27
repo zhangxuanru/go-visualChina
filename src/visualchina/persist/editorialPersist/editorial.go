@@ -1,4 +1,4 @@
-package persist
+package editorialPersist
 
 import (
 	"hash/crc32"
@@ -7,12 +7,15 @@ import (
 	"time"
 	"strconv"
 	"libary/query"
+	"encoding/json"
+	"libary/upload"
 )
 
 type Editorial  struct{
 	NavDb  chan Model.NavDb
 	status chan bool
 }
+
 
 
 func (s *Editorial) NavSave(r Model.NavDb) Model.NavDb {
@@ -88,6 +91,7 @@ func (s *Editorial) SaveGenera(genera query.Generalize) (bool) {
 	return true
 }
 
+
 func (s *Editorial) SaveRecommend(recommend query.LevelRecommend) (bool)  {
 	saveRecommend := Model.RecommendDb{
 		GroupId:    recommend.GroupId,
@@ -102,4 +106,53 @@ func (s *Editorial) SaveRecommend(recommend query.LevelRecommend) (bool)  {
 	return true
 }
 
+
+func (s *Editorial) SaveGroup(group List) (bool) {
+	loc, _ := time.LoadLocation("Local")
+	parse, _ := time.ParseInLocation("2006-01-02 15:04:05", group.ImgDate,loc)
+	groupId,_ := strconv.ParseInt(group.GroupId,10,64)
+    groupData := Model.GroupDb{
+           GroupId:groupId,
+           OneCategory:group.OneCategory,
+           Title:group.Title,
+           Caption:group.Caption,
+           FirstPicId:strconv.FormatInt(group.FirstResId,10),
+           GroupPicsNum:group.GroupPicsNum,
+           Keywords:group.Keywords,
+           ImgDate:parse.Unix(),
+           AddDate:time.Now().Unix(),
+     }
+     fields :=[]string{"group_id"}
+	 ret := Model.GetGroupDataByGroupId(groupId, fields)
+	 if len(ret) == 0{
+	      groupData.Save()
+	 }
+	 GroupPics,_:= json.Marshal(group.GroupPics)
+	 groupDetail := Model.GroupDetailDb{
+	 	 GroupId:groupId,
+		 EqualwUrl:group.EqualwUrl,
+		 EqualwImageId:upload.UploadToQiniu(group.EqualwUrl),
+		 EqualhUrl:group.EqualhUrl,
+		 EqualhImageId:upload.UploadToQiniu(group.EqualhUrl),
+		 Width:group.Width,
+		 Height:group.Height,
+		 Url800:group.Url800,
+		 Url800ImageId:upload.UploadToQiniu(group.Url800),
+		 GroupPics: string(GroupPics),
+		 AddDate:time.Now().Unix(),
+	 }
+	r := Model.GetGroupDetailByGroupId(groupId, fields)
+	if len(r) == 0{
+	    groupDetail.Save()
+	}
+	return  true
+}
+
+
+
+func (s *Editorial) UpdateCateGoryTotalNum(id int64,group GroupJsonData) (bool) {
+	   total := group.Data.TotalCount
+	   Model.UpdateCateGoryTotalNum(id, total)
+	   return  true
+}
 
