@@ -16,14 +16,15 @@ type Item struct {
 }
 
 type RequestArgs struct {
-	Id    int64
-	Title string
-	Type  string
-	Update string
-	Pid   int64
-	NavId  int64
-	Page  int64
-	PerPage int64
+	Id       int64
+	Title    string
+	Type     string
+	Update   string
+	Pid      int64
+	GroupId  string
+	NavId    int64
+	Page     int64
+	PerPage  int64
 	CategoryId int64
 	Data interface{}
 }

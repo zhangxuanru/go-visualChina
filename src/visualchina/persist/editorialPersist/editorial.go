@@ -107,7 +107,7 @@ func (s *Editorial) SaveRecommend(recommend query.LevelRecommend) (bool)  {
 }
 
 
-func (s *Editorial) SaveGroup(group List) (bool) {
+func (s *Editorial) SaveGroup(group List) (b bool) {
 	loc, _ := time.LoadLocation("Local")
 	parse, _ := time.ParseInLocation("2006-01-02 15:04:05", group.ImgDate,loc)
 	groupId,_ := strconv.ParseInt(group.GroupId,10,64)
@@ -124,8 +124,12 @@ func (s *Editorial) SaveGroup(group List) (bool) {
      }
      fields :=[]string{"group_id"}
 	 ret := Model.GetGroupDataByGroupId(groupId, fields)
+	 var id int64
 	 if len(ret) == 0{
-	      groupData.Save()
+		 id, _= groupData.Save()
+	 }
+	 if id == 0{
+	 	  return  false
 	 }
 	 GroupPics,_:= json.Marshal(group.GroupPics)
 	 groupDetail := Model.GroupDetailDb{
@@ -143,7 +147,10 @@ func (s *Editorial) SaveGroup(group List) (bool) {
 	 }
 	r := Model.GetGroupDetailByGroupId(groupId, fields)
 	if len(r) == 0{
-	    groupDetail.Save()
+		id, _= groupDetail.Save()
+	}
+	if id == 0{
+		 return  false
 	}
 	return  true
 }

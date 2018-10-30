@@ -93,3 +93,11 @@ func UpdateCateGoryTotalNum(categoryId int64,total int64)(count int64,err error)
 	return
 }
 
+
+//更新分类抓取总数
+func UpdateCateGoryGrabTotalNum(categoryId int64,total int64)(count int64,err error){
+	sql := fmt.Sprintf("UPDATE %s SET grab_total_count=grab_total_count+%d WHERE category_id=%d",CATEGORY_TABLE,total,categoryId)
+	count, err = db.UpdateSql(sql)
+	return
+}
+
