@@ -76,6 +76,7 @@ func ParseEditorialUpdateOriginal(contents []byte,url string,args engine.Request
 	document, e := goquery.NewDocumentFromReader(reader)
 	if e != nil {
 		logger.Error.Println("grab url ",url," args:",args," goquery error:",e)
+		return engine.ParseResult{}
 	}
 	catList := query.ParseEditorialUpdate(document)
 	for catId,title := range catList{
@@ -98,6 +99,7 @@ func ParseEditorialNavLevelPage(contents []byte,url string,args engine.RequestAr
 	document, e := goquery.NewDocumentFromReader(reader)
 	if e != nil {
 		logger.Error.Println("grab url ",url," args:",args," goquery error:",e)
+		return engine.ParseResult{}
 	}
 	tagList := query.ParseEditorialLevelPage(document)
 	//保存tag

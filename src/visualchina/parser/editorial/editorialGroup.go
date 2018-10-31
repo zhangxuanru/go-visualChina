@@ -82,13 +82,30 @@ func SaveGroup(contents []byte,url string,args engine.RequestArgs) (ret engine.P
 		mp = mapGroupTotal(item.Keywords)
 		mpGroupUrl = append(mpGroupUrl,item.GroupId)
 	}
+	//返回抓取图集的request
+	for _,groupId := range mpGroupUrl{
+		ret.Requests = append(ret.Requests,engine.Request{
+			Url:constant.BaseUrl+"/group/"+groupId,
+			Method:"GET",
+			Parser:engine.NewFuncParser(ParseEditorialAtlasTopic,args.Title),
+			Args:engine.RequestArgs{
+				CategoryId:args.CategoryId,
+				Title:args.Title,
+				NavId:args.NavId,
+				GroupId:groupId,
+				Page:1,
+			},
+		})
+	}
+	mpGroupUrl = make([]string,810)
 	total:= getSaveGroupMax(group.Data.TotalCount)
 	if (args.Page) *100 >= total{
 		//更新各分类的总数
 		for id,val := range mp{
-		     Model.UpdateCateGoryGrabTotalNum(id, val)
-			 delete(mp,id)
+			Model.UpdateCateGoryGrabTotalNum(id, val)
+			delete(mp,id)
 		}
+		return ret
 	}
 	ret.Requests = append(ret.Requests,engine.Request{
 		Url:constant.GroupDataUrl,
@@ -103,22 +120,6 @@ func SaveGroup(contents []byte,url string,args engine.RequestArgs) (ret engine.P
 		},
 		Content: fmt.Sprintf("key=%d&page=%d&per_page=%d&isEdit=1&timeliness=0",args.CategoryId,args.Page+1,100),
 	})
-	//返回抓取图集的request
-	for _,groupId := range mpGroupUrl{
-		ret.Requests = append(ret.Requests,engine.Request{
-              Url:constant.BaseUrl+"/group/"+groupId,
-              Method:"GET",
-			  Parser:engine.NewFuncParser(ParseEditorialAtlasTopic,args.Title),
-			  Args:engine.RequestArgs{
-				CategoryId:args.CategoryId,
-				Title:args.Title,
-				NavId:args.NavId,
-				GroupId:groupId,
-			    Page:1,
-			},
-		})
-	}
-	mpGroupUrl = make([]string,810)
 	return  ret
 }
 

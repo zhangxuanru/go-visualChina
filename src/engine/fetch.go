@@ -24,9 +24,13 @@ func FetchGet(r Request)(ParseResult,error)  {
 		all, _ := ioutil.ReadAll(file)
 		return  r.Parser.Parse(all,r.Url,r.Args),nil
 	}
-
 	if r.Args.Id > 0{
 		file, _ := os.Open("src/test/nav_view.html")
+		all, _ := ioutil.ReadAll(file)
+		return  r.Parser.Parse(all,r.Url,r.Args),nil
+	}
+	if len(r.Args.GroupId) > 0{
+		file, _ := os.Open("src/test/group.html")
 		all, _ := ioutil.ReadAll(file)
 		return  r.Parser.Parse(all,r.Url,r.Args),nil
 	}
