@@ -77,13 +77,16 @@ func SaveGroup(contents []byte,url string,args engine.RequestArgs) (ret engine.P
 		  <-tick
 		b := editorial.SaveGroup(item)
 		if b == false{
-			continue
+			 continue
 		}
 		mp = mapGroupTotal(item.Keywords)
 		mpGroupUrl = append(mpGroupUrl,item.GroupId)
 	}
 	//返回抓取图集的request
 	for _,groupId := range mpGroupUrl{
+		if groupId == "" || len(groupId) == 0{
+             continue
+		}
 		ret.Requests = append(ret.Requests,engine.Request{
 			Url:constant.BaseUrl+"/group/"+groupId,
 			Method:"GET",
