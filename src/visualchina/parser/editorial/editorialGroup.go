@@ -65,20 +65,20 @@ func SaveGroup(contents []byte,url string,args engine.RequestArgs) (ret engine.P
           return
 	}
 	group:= editorialPersist.ParseGroupJson(contents)
-	mp := make(map[int64]int64)
-	mpGroupUrl := make([]string,810)
 	if group.Code != http.StatusOK || group.Status != 1{
 		logger.Info.Println("SaveGroup json :",group)
 		return
 	}
+	mp,categoryGroupMap,mpGroupUrl := make(map[int64]int64), make(map[string]bool),make([]string,810)
 	//这里根据keywords字段 按分类ID 拆成map, 然后各自加加，最后记录表中各分类共抓取多少数据
 	tick := time.Tick(5 * time.Microsecond)
 	for _,item := range group.Data.List{
 		  <-tick
 		b := editorial.SaveGroup(item)
 		if b == false{
-			 continue
+			   continue
 		}
+		editorial.SaveCategoryGroup(item,categoryGroupMap)
 		mp = mapGroupTotal(item.Keywords)
 		mpGroupUrl = append(mpGroupUrl,item.GroupId)
 	}

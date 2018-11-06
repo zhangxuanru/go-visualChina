@@ -19,6 +19,11 @@ func FetchUrl(r Request) (ParseResult,error){
 
 func FetchGet(r Request)(ParseResult,error)  {
 	//test
+	if r.Args.ItemId > 0{
+		file, _ := os.Open("src/test/pic.html")
+		all, _ := ioutil.ReadAll(file)
+		return  r.Parser.Parse(all,r.Url,r.Args),nil
+	}
 	if r.Args.Id == 8{
 		file, _ := os.Open("src/test/gundong.html")
 		all, _ := ioutil.ReadAll(file)
@@ -34,6 +39,7 @@ func FetchGet(r Request)(ParseResult,error)  {
 		all, _ := ioutil.ReadAll(file)
 		return  r.Parser.Parse(all,r.Url,r.Args),nil
 	}
+
 
 	open, _ := os.Open("src/test/editorial.html")
 	all, _ := ioutil.ReadAll(open)

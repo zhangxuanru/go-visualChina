@@ -3,7 +3,8 @@ package editorial
 import (
 	"engine"
 	"visualchina/persist/editorialPersist"
-	"fmt"
+	"config/constant"
+	"strconv"
 )
 
 //图集页
@@ -12,20 +13,36 @@ func ParseEditorialAtlasTopic(contents []byte,url string,args engine.RequestArgs
 	 if err != nil || atlas.Data.Status != 1{
 	 	return
 	 }
-	totalPage := editorialPersist.ParseAtlasPage(contents)
-    groupId,page := args.GroupId,args.Page
-    for _,item := range atlas.Data.Data.List{
-		editorial.SaveAtlas(item)
+	  totalPage := editorialPersist.ParseAtlasPage(contents)
+      for _,item := range atlas.Data.Data.List{
+    	if item.Id == 0{
+    		 continue
+		}
+    	ret.Requests = append(ret.Requests,engine.Request{
+			Url: constant.BaseUrl+"/"+ strconv.FormatInt(item.Id,10)+"?groupid="+args.GroupId+"&",
+			Method:"GET",
+			Parser:engine.NewFuncParser(ParseEditorialPic,args.Title),
+			Args:engine.RequestArgs{
+				CategoryId:args.CategoryId,
+				GroupId:args.GroupId,
+				ItemId:item.Id,
+				Data:item,
+			},
+		})
 	}
-
-    //如果是最后一页，则不再继续请求图集的链接了
-    if page == totalPage{
-    	return
+	if  args.Page < totalPage{
+		ret.Requests = append(ret.Requests,engine.Request{
+			Url:constant.BaseUrl+"/group/"+args.GroupId,
+			Method:"GET",
+			Parser:engine.NewFuncParser(ParseEditorialAtlasTopic,args.Title),
+			Args:engine.RequestArgs{
+				CategoryId:args.CategoryId,
+				Title:args.Title,
+				NavId:args.NavId,
+				GroupId:args.GroupId,
+				Page:args.Page+1,
+			},
+		})
 	}
-	fmt.Printf("%+v----%d",atlas.Data.Message,totalPage)
-	return engine.ParseResult{}
+	return ret
 }
-
-
-
-

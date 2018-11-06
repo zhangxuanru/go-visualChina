@@ -11,7 +11,10 @@ import (
 	"engine"
 	"fmt"
 	"strconv"
+	"io/ioutil"
+	"errors"
 	"strings"
+	"regexp"
 )
 
 var (
@@ -73,32 +76,37 @@ func testgoquery() {
 
 //编辑图片--栏目页
 func testeditorupdate()  {
-	file, e := os.Open("src/test/nav_view.html")
+	file, e := os.Open("src/test/group.html")
 	if e != nil{
 		panic(e)
 	}
-	document, i := goquery.NewDocumentFromReader(file)
-	if i != nil {
-		panic(i)
+	defer file.Close()
+	compile, err := regexp.Compile(`<script>window.__REDUX_STATE__(.*)</script>`)
+	if err != nil{
+		panic(err)
 	}
-	document.Find(".picrecommend>.pro-item>.pro-item-box").Each(func(i int, selection *goquery.Selection) {
-		 link,_ := selection.Find("a").Attr("href")
-		 link = strings.TrimSpace(link)
-		topicId := ""
-		groupId := ""
-		 if strings.Contains(link,"/topic/"){
-			 topicId = strings.TrimLeft(link,"/topic/")
-		 }
-		if strings.Contains(link,"/group/"){
-			groupId = strings.TrimLeft(link,"/group/")
-		}
-
-		fmt.Println(link,groupId,topicId)
-
-
+	bytes, _ := ioutil.ReadAll(file)
+	find := compile.FindSubmatch(bytes)
+	if len(find)<2{
+		panic(errors.New("error"))
+	}
+    content := strings.TrimSpace(string(find[1]))
+	content = strings.TrimFunc(content, func(r rune) bool {
+		return r ==' ' || r ==';' || r == '='
 	})
 
- }
+    fmt.Println(content)
+
+	//document, _ := goquery.NewDocumentFromReader(file)
+	//page := document.Find(".page").Eq(0).Text()
+	//page = strings.Trim(page," / ")
+	//fmt.Println("---------------")
+	//fmt.Println( page)
+	//fmt.Println("---------------")
+
+
+
+}
 
 
 

@@ -17,6 +17,7 @@ type Item struct {
 
 type RequestArgs struct {
 	Id       int64
+	ItemId   int64
 	Title    string
 	Type     string
 	Update   string
