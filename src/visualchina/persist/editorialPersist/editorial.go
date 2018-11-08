@@ -375,6 +375,28 @@ func (s *Editorial) SaveCategoryItem(item CategoryList) (id int64,err error) {
 }
 
 
+//保存专题下的group
+func (s *Editorial) SaveTopicGroup(group TopicGroupList) (id int64, err error){
+	local,_ := time.LoadLocation("Local")
+	imgDate,_ := time.ParseInLocation("2006-01-02 15:04:05",group.ImgDate,local)
+	meta := regexp.QuoteMeta(group.Caption)
+	db := Model.TopicGroupDb{
+		TopicId:group.Cid,
+		GroupId:group.ID,
+		Title:group.Title,
+		Caption:meta,
+		EqualwUrl:group.EqualwURL,
+		EqualhUrl:group.EqualhURL,
+		GroupPicsNum:group.GroupPicsNum,
+		Width:group.Width,
+		Height:group.Height,
+		ImgDate:imgDate.Unix(),
+		AddDate:time.Now().Unix(),
+	}
+	id, err = db.Save()
+	return
+}
+
 
 
 func (s *Editorial) UpdateCateGoryTotalNum(id int64,group GroupJsonData) (bool) {

@@ -29,6 +29,7 @@ type TopicImages struct {
 
 type TopicGroupList  struct {
 	ID           int    `json:"id"`
+	Cid          int64
 	GroupID      string `json:"group_id"`
 	Title        string `json:"title"`
 	Caption      string `json:"caption"`

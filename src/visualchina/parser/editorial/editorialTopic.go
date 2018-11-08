@@ -9,6 +9,9 @@ import (
 
 //专题二级页
 func ParseEditorialNavTopic(contents []byte,url string,args engine.RequestArgs) (ret engine.ParseResult) {
+	if len(contents) == 0{
+		return  engine.ParseResult{}
+	}
 	topicData, err := editorialPersist.ParseTopicJson(contents)
 	if err != nil {
 		return engine.ParseResult{}
@@ -38,6 +41,7 @@ func ParseEditorialNavTopic(contents []byte,url string,args engine.RequestArgs) 
 				 Parser:engine.NewFuncParser(ParseEditorialTopicGroup,args.Title),
 				 Args:engine.RequestArgs{
 					 CategoryId:itemId,
+					 Page:1,
 					 UrlType:"topicgroup",
 				 },
 			 })
@@ -49,7 +53,10 @@ func ParseEditorialNavTopic(contents []byte,url string,args engine.RequestArgs) 
 
 //解析专题分类下的各个专题
 func ParseEditorialTopicCategory(contents []byte,url string,args engine.RequestArgs) (ret engine.ParseResult) {
- 	topicData, err := editorialPersist.ParseTopicCategoryJson(contents)
+	if len(contents) == 0{
+		return  engine.ParseResult{}
+	}
+	topicData, err := editorialPersist.ParseTopicCategoryJson(contents)
 	if err != nil {
 		 return engine.ParseResult{}
 	}
@@ -65,6 +72,7 @@ func ParseEditorialTopicCategory(contents []byte,url string,args engine.RequestA
 				Parser:engine.NewFuncParser(ParseEditorialTopicGroup,args.Title),
 				Args:engine.RequestArgs{
 					CategoryId:int64(val.ID),
+					Page:1,
 					UrlType:"topicgroup",
 				},
 			})
@@ -92,12 +100,37 @@ func ParseEditorialTopicCategory(contents []byte,url string,args engine.RequestA
 
 //解析专题下的group
 func ParseEditorialTopicGroup(contents []byte,url string,args engine.RequestArgs) (ret engine.ParseResult) {
+	if len(contents) == 0{
+		return  engine.ParseResult{}
+	}
 	topic, err := editorialPersist.ParseTopicGroupJson(contents)
 	if err != nil{
 		return engine.ParseResult{}
 	}
+	TopicImages := topic.TopicInfo.TopicImages
+	for _,item := range TopicImages.List{
+		item.Cid = args.CategoryId
+		editorial.SaveTopicGroup(item)
+		//保存成功后， 查询visual_group表中是否有此group的信息， 如果没有，返回一个request,去请求group的信息，然后保存图片
 
-	return engine.ParseResult{}
+	}
+
+	if TopicImages.PageNum * TopicImages.PageSize >= TopicImages.Total{
+		return engine.ParseResult{}
+	}
+	 categoryId := strconv.FormatInt(args.CategoryId,10)
+	 nextPage := strconv.FormatInt(args.Page +1,10)
+	 ret.Requests = append(ret.Requests,engine.Request{
+			Url: constant.BaseUrl+"/topic/"+categoryId+"?showType=1&pageNum="+nextPage+"&pageSize=100",
+			Method:"GET",
+			Parser:engine.NewFuncParser(ParseEditorialTopicGroup,args.Title),
+			Args:engine.RequestArgs{
+				CategoryId:args.CategoryId,
+				Page:args.Page+1,
+				UrlType:"topicgroup",
+			},
+		})
+	return ret
 }
 
 
