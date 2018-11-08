@@ -29,8 +29,23 @@ func FetchGet(r Request)(ParseResult,error)  {
 		all, _ := ioutil.ReadAll(file)
 		return  r.Parser.Parse(all,r.Url,r.Args),nil
 	}
+	if r.Args.UrlType == "topic"{
+		file, _ := os.Open("src/test/topic.html")
+		all, _ := ioutil.ReadAll(file)
+		return  r.Parser.Parse(all,r.Url,r.Args),nil
+	}
+	if r.Args.UrlType == "topiccategory"{
+		file, _ := os.Open("src/test/topic_category.html")
+		all, _ := ioutil.ReadAll(file)
+		return  r.Parser.Parse(all,r.Url,r.Args),nil
+	}
+	if r.Args.UrlType == "topicgroup"{
+		file, _ := os.Open("src/test/topic_group.html")
+		all, _ := ioutil.ReadAll(file)
+		return  r.Parser.Parse(all,r.Url,r.Args),nil
+	}
 	if r.Args.Id > 0{
-		file, _ := os.Open("src/test/nav_view.html")
+	    file, _ := os.Open("src/test/nav_view.html")
 		all, _ := ioutil.ReadAll(file)
 		return  r.Parser.Parse(all,r.Url,r.Args),nil
 	}

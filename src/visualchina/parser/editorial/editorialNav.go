@@ -34,17 +34,19 @@ func ParseEditorial(contents []byte, url string,args engine.RequestArgs) engine.
 		args.Title = nav.Title
 		result := saveNav(url,args)
 		parser = ParseEditorialNavLevelPage
-		//原创
-		if strings.Contains(url,"original"){
-			parser = ParseEditorialNavOriginal
-		}
+		urlType :=""
 		//滚动
 		if strings.Contains(url,"editorial-update"){
 			parser = ParseEditorialUpdateOriginal
 		}
+		//原创
+		if strings.Contains(url,"original"){
+			parser = ParseEditorialNavOriginal
+		}
 		//专题
 		if strings.Contains(url,"topics"){
 			parser = ParseEditorialNavTopic
+			urlType = "topic"
 		}
 		req := engine.Request{
 			Url:url,
@@ -52,6 +54,7 @@ func ParseEditorial(contents []byte, url string,args engine.RequestArgs) engine.
 			Args: engine.RequestArgs{
 				Id:result.Id,
 				Type:args.Type,
+				UrlType:urlType,
 				Update:args.Update,
 				Title:result.Title,
 			},
@@ -60,14 +63,19 @@ func ParseEditorial(contents []byte, url string,args engine.RequestArgs) engine.
 	}
 	//获取首页banner
 
+
 	//获取首页推荐专题
+
 
 	return ret
 }
 
 
+
 //滚动二级页（将分类ID保存到导航表中）
 func ParseEditorialUpdateOriginal(contents []byte,url string,args engine.RequestArgs) engine.ParseResult {
+	return  engine.ParseResult{}
+
 	if args.Update == "1"{ //如果只抓最新的数据则不需要做以下的操作
 		 return engine.ParseResult{}
 	}
@@ -92,6 +100,8 @@ func ParseEditorialUpdateOriginal(contents []byte,url string,args engine.Request
 
 //抓取栏目 二级页
 func ParseEditorialNavLevelPage(contents []byte,url string,args engine.RequestArgs) engine.ParseResult {
+	return engine.ParseResult{}
+
 	if args.Update == "1"{ //如果只抓最新的数据则不需要做以下的操作
 		return getGroupDataByNavId(args.Id)
 	}

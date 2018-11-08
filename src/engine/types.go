@@ -20,6 +20,7 @@ type RequestArgs struct {
 	ItemId   int64
 	Title    string
 	Type     string
+	UrlType  string
 	Update   string
 	Pid      int64
 	GroupId  string

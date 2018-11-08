@@ -16,6 +16,11 @@ import (
 type Editorial  struct{
 	NavDb  chan Model.NavDb
 	status chan bool
+	TopicSaveList map[int64]TopicSave
+}
+
+type TopicSave struct{
+	Type int
 }
 
 func (s *Editorial) NavSave(r Model.NavDb) Model.NavDb {
@@ -174,8 +179,6 @@ func (s *Editorial) SaveCategoryGroup(item List,mp map[string]bool)  {
 	}
 }
 
-
-
 func (s *Editorial) SavePic(CategoryId int64,item Info) (id int64, err error){
     ImageDate := item.PicInfo.ImageDate
 	loc, _ := time.LoadLocation("Local")
@@ -230,9 +233,156 @@ func (s *Editorial) SavePicDetail(item Info)  (id int64, err error) {
 //写group_topic_relation表
 func (s *Editorial) SaveTopicByGroupId(topic int64,groupId int64){}
 
+
+//写入visual_topic_category表
+func (s *Editorial) SaveTopicCategory(topic *TopicJson) (ret bool) {
+	if s.TopicSaveList == nil{
+		 s.TopicSaveList = make(map[int64]TopicSave,100)
+	}
+	for _,item := range topic.Data.Data.Twelve{
+		if item.ID == 0{
+			 continue
+		}
+		if _,ok := s.TopicSaveList[item.ID];ok{
+			continue
+		}
+		db := Model.TopicCategoryDb{
+			CategoryId: item.ID,
+			CategoryName:item.Name,
+			Link:item.Link,
+			AddDate:time.Now().Unix(),
+		}
+		//row := Model.GetTopicCategoryDataByCateId(item.ID)
+		//if len(row) > 0{
+		//	itemTopic := s.TopicSaveList[item.ID]
+		//	itemTopic.Type = 1
+		//	s.TopicSaveList[item.ID] = itemTopic
+		//	continue
+		//}
+		id, _ := db.Save()
+		if id > 0{
+			itemTopic := s.TopicSaveList[item.ID]
+			itemTopic.Type = 1
+			s.TopicSaveList[item.ID] = itemTopic
+		}
+	}
+	return true
+}
+
+
+//写入visual_topic表
+func (s *Editorial) SaveTopicItem( item TopicList) (id int64, err error) {
+	if s.TopicSaveList == nil{
+	  	 s.TopicSaveList = make(map[int64]TopicSave,1024)
+	}
+	itemId := int64(item.ID)
+	if _,ok := s.TopicSaveList[itemId];ok{
+		return
+	}
+	imageId := int64(0)
+	if len(item.EqualWUrl) > 0{
+		imageId = upload.UploadToQiniu(item.EqualWUrl)
+	}
+	local,_ := time.LoadLocation("Local")
+	CreatedTime,_ := time.ParseInLocation("2006-01-02 15:04:05",item.CreatedTime,local)
+	UpdatedTime,_ := time.ParseInLocation("2006-01-02 15:04:05",item.UpdatedTime,local)
+	db := Model.TopicDb{
+		TopicId:item.ID,
+		ImageId:imageId,
+		Type:item.Type,
+		CategoryId:item.Cid,
+		Title:item.Title,
+		Keywords:item.Keywords,
+		Description:item.Description,
+		EqualwUrl:item.EqualWUrl,
+		Cover:item.Cover,
+		IsBanner:0,
+		Status:1,
+		CreatedYear:CreatedTime.Year(),
+		CreatedTime:CreatedTime.Unix(),
+		UpdatedTime:UpdatedTime.Unix(),
+		AddDate:time.Now().Unix(),
+	}
+	//row := Model.GetTopicDataById(itemId)
+	//if len(row) > 0{
+	//	itemTopic := s.TopicSaveList[itemId]
+	//	itemTopic.Type = 0
+	//	s.TopicSaveList[itemId] = itemTopic
+	//    return
+	//}
+	i, err := db.Save()
+	if err == nil{
+		itemTopic := s.TopicSaveList[itemId]
+		itemTopic.Type = 0
+		s.TopicSaveList[itemId] = itemTopic
+	}
+	return i,err
+}
+
+
+func (s *Editorial) SaveTopicData(topic *TopicJson)  {
+	for _,list := range topic.Data.Data.Twelve{
+		for _,item := range list.List{
+		    s.SaveTopicItem(item)
+		}
+	}
+     for _,list := range topic.Data.Data.List{
+		  for _,item := range list{
+               s.SaveTopicItem(item)
+		  }
+	 }
+}
+
+
+func (s *Editorial) SaveTopic(topic *TopicJson)  {
+       s.SaveTopicCategory(topic)
+       s.SaveTopicData(topic)
+}
+
+
+func (s *Editorial) SaveCategoryItem(item CategoryList) (id int64,err error) {
+	if s.TopicSaveList == nil{
+		s.TopicSaveList = make(map[int64]TopicSave,1024)
+	}
+	itemId := int64(item.ID)
+	if _,ok := s.TopicSaveList[itemId];ok{
+		return
+	}
+	imageId := int64(0)
+	if len(item.EqualwURL) > 0{
+		imageId = upload.UploadToQiniu(item.EqualwURL)
+	}
+	local,_ := time.LoadLocation("Local")
+	CreatedTime,_ := time.ParseInLocation("2006-01-02 15:04:05",item.ImgDate,local)
+	db := Model.TopicDb{
+		TopicId:item.ID,
+		ImageId:imageId,
+		CategoryId:item.Cid,
+		Title:item.Title,
+		Description:item.Caption,
+		EqualwUrl:item.EqualwURL,
+		CreatedYear:CreatedTime.Year(),
+		CreatedTime:CreatedTime.Unix(),
+		AddDate:time.Now().Unix(),
+	}
+	id, err = db.Save()
+	if err == nil{
+		itemTopic := s.TopicSaveList[itemId]
+		itemTopic.Type = 0
+		s.TopicSaveList[itemId] = itemTopic
+	}
+	return
+}
+
+
+
+
 func (s *Editorial) UpdateCateGoryTotalNum(id int64,group GroupJsonData) (bool) {
 	   total := group.Data.TotalCount
 	   Model.UpdateCateGoryTotalNum(id, total)
 	   return  true
 }
+
+
+
 

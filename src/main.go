@@ -50,6 +50,7 @@ func main(){
 		}
 		spider.InitJobs(urlInfo,argReq)
 	}
+	fmt.Println("RUN OK")
 }
 
 

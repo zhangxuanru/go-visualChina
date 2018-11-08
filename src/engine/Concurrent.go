@@ -3,6 +3,7 @@ package engine
 import (
 	"logger"
 	"sync"
+	"fmt"
 )
 
 var ws sync.WaitGroup
@@ -32,8 +33,10 @@ func (c *ConcurrentEngine) Run(seeds ...Request)  {
 	 for{
 		ret := <-out
 		for _, request := range ret.Requests {
-			c.Scheduler.Submit(request)
-			count++
+			if len(request.Url) > 0{
+				c.Scheduler.Submit(request)
+				count++
+			}
 		}
 		if count == 0{
 			break
@@ -47,12 +50,15 @@ func (c *ConcurrentEngine) CreateWorker(in chan Request, out chan ParseResult,re
 		for{
            request := <-in
 		   result,err := FetchUrl(request)
+		   fmt.Println(request.Url,"-------",len(result.Requests),"----------",err)
+
 		   if err!=nil{
 			    logger.Error.Println("抓取",request.Url,"失败，失败原因是:",err)
+			    *req--
 			    continue
 		   }
-		    out <- result
 			*req--
+		    out <- result
 		}
 	}()
 }
