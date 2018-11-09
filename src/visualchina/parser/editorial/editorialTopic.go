@@ -110,9 +110,7 @@ func ParseEditorialTopicGroup(contents []byte,url string,args engine.RequestArgs
 	TopicImages := topic.TopicInfo.TopicImages
 	for _,item := range TopicImages.List{
 		item.Cid = args.CategoryId
-		editorial.SaveTopicGroup(item)
-		//保存成功后， 查询visual_group表中是否有此group的信息， 如果没有，返回一个request,去请求group的信息，然后保存图片
-
+	    editorial.SaveTopicGroup(item)
 	}
 
 	if TopicImages.PageNum * TopicImages.PageSize >= TopicImages.Total{

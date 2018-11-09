@@ -22,7 +22,7 @@ type TopicGroupDb struct {
 	AddDate       int64
 }
 
-const TOPIC_GROUP_TABLE = "group_topic_group"
+const TOPIC_GROUP_TABLE = "visual_topic_group"
 
 func (topic *TopicGroupDb) Save() (id int64, err error) {
 	sql := fmt.Sprintf("INSERT INTO %s (topic_id,group_id,image_id,title,caption,equalw_url,equalh_url,group_pics_num,width,height,img_date,add_date) " +
